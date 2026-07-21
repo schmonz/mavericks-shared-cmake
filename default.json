@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Shared Renovate policy for mavericks-* projects. A consumer's entire .github/renovate.json is:",
+    "{ \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\", \"extends\": [\"github>ModernMavericks/shared-cmake\"] }",
+    "Provides config:recommended + automerge. shared-cmake is a versioned GitHub Action: consumers pin",
+    "'uses: ModernMavericks/shared-cmake/...@v1' and Renovate's native github-actions manager tracks it",
+    "-- no custom manager needed for it. This preset does add a manager for mavericks-legacysupport",
+    "releases (tag the pinned version with a '# mavericks-legacysupport' comment)."
+  ],
+  "extends": [
+    "config:recommended"
+  ],
+  "automerge": true,
+  "ignoreTests": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["(^|/)versions\\.sh$", "^\\.github/.+\\.ya?ml$"],
+      "matchStrings": ["(?<currentValue>[0-9][^\\s#\"']*)\\s*#\\s*mavericks-legacysupport"],
+      "depNameTemplate": "mavericks-legacysupport",
+      "packageNameTemplate": "ModernMavericks/macports-legacy-support",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$",
+      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-mavericks\\.(?<build>\\d+)$"
+    }
+  ]
+}
