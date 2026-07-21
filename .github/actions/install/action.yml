@@ -1,0 +1,26 @@
+name: Install mavericks-shared-cmake
+description: >
+  Configure + install mavericks-shared-cmake to a prefix so consumers find it via
+  find_package() / the CMake user package registry. shared-cmake does its own
+  installing -- a consumer just references this action at a pinned ref (that ref IS
+  the version pin); it should NOT clone + `cmake --install` shared-cmake by hand.
+
+inputs:
+  prefix:
+    description: Install prefix (self-registers in the user package registry). Default $HOME/.local.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -eu
+        # This action is checked out at ${{ github.action_path }} = <repo>/.github/actions/install;
+        # the repo root (with CMakeLists.txt) is three levels up.
+        root="$(cd "$GITHUB_ACTION_PATH/../../.." && pwd)"
+        prefix="${{ inputs.prefix }}"; [ -n "$prefix" ] || prefix="$HOME/.local"
+        cmake -S "$root" -B "$RUNNER_TEMP/msc-build"
+        cmake --install "$RUNNER_TEMP/msc-build" --prefix "$prefix"
+        echo "installed mavericks-shared-cmake -> $prefix (registered in the CMake user package registry)"
